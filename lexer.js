@@ -9,6 +9,7 @@ const TokenType = {
   CloseParem: "CloseParem", // Sluit haakje
   BinaryOperator: "BinaryOperator", // Binaire operator
   Let: "Let", // Laat
+  EOF:"EOF"//einde van bestand
 };
 
 // Gereserveerde sleutelwoorden
@@ -76,7 +77,7 @@ function tokenize(sourceCode) {
       src.shift(); // Ga voorbij het onbekende teken om oneindige lus te voorkomen
     }
   }
-
+  tokens.push((TokenType.EOF,"Einde bestand" ))
   return tokens;
 }
 
