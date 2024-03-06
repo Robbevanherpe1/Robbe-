@@ -1,100 +1,92 @@
-export const TokenType =  {
-  Number,
-  Identifier,
-  Equals,
-  OpenParem,
-  CloseParem,
-  BinaryOperator,
-  Let,
+const fs = require('fs');
+
+// Definitie van token types
+const TokenType = {
+  Number: "Number", // Nummer
+  Identifier: "Identifier", // Identifier
+  Equals: "Equals", // Gelijkheidsteken
+  OpenParem: "OpenParem", // Open haakje
+  CloseParem: "CloseParem", // Sluit haakje
+  BinaryOperator: "BinaryOperator", // Binaire operator
+  Let: "Let", // Laat
+};
+
+// Gereserveerde sleutelwoorden
+const KEYWORDS = {
+  "let": TokenType.Let,
+};
+
+// Functie om een token aan te maken
+function token(value, type) {
+  return { value, type };
 }
 
-//gereserveerde keywords
-const KEYWORDS ={
-
-  "let": TokenType.Let
+// Functie om te controleren of het alfabetische tekens zijn
+function isAlpha(src) {
+  return /^[A-Za-z]+$/.test(src);
 }
 
-export let Token = {
-    value: string,
-    type: TokenType
-
+// Functie om te controleren of het gehele getallen zijn
+function isInt(src) {
+  return /^[0-9]+$/.test(src);
 }
 
-//aanmaken token 
-function token(value,type) {
-
-  return {value,type}
+// Functie om te controleren of het te negeren tekens zijn
+function isSkippable(src) {
+  return /^\s+$/.test(src) || src === '';
 }
 
-//meerdere characters token verwerken
-
-  // contorleren voor text
-  function isaplha (src){
-    return src.toUpperCase() != src.toLowerCase()
-  }
-
-  // contorleren voor int
-  function isint (src){
-    const c = str.charCodeAt(0);
-    const bounds = ['0'.charCodeAt(0),'9'.charCodeAt(0)];
-    return (c >= bounds[0] && c<= bounds[1])
-  }
-
-   // contorleren voor skipbare characters
-   function isskippable (src){
-    return str =='' || str =='\n' || str =='\t';
-  }
-
-
-
-
-export function tokenSize(sourceCode){
+// Functie om de broncode te tokeniseren
+function tokenize(sourceCode) {
   const tokens = [];
-  const src = sourceCode.split("");
+  let src = sourceCode.split("");
 
-  while(src.length >0){
-      if( src[0] == '('){
-        tokens.push(token(src.shift(),TokenType.OpenParem));
-      } else if (src[0] == ')') {
-        tokens.push(token(src.shift(),TokenType.CloseParem));
+  while (src.length > 0) {
+    if (isSkippable(src[0])) {
+      src.shift();
+      continue;
+    }
+    if (src[0] === '(') {
+      tokens.push(token(src.shift(), TokenType.OpenParem));
+    } else if (src[0] === ')') {
+      tokens.push(token(src.shift(), TokenType.CloseParem));
+    } else if ('+-*/'.includes(src[0])) {
+      tokens.push(token(src.shift(), TokenType.BinaryOperator));
+    } else if (src[0] === '=') {
+      tokens.push(token(src.shift(), TokenType.Equals));
+    } else if (isInt(src[0])) {
+      let num = "";
+      while (src.length > 0 && isInt(src[0])) {
+        num += src.shift();
       }
-      else if (src[0] == '+' || scr[0] =="-" || src[0] == '*' || scr[0] =="/") {
-        tokens.push(token(src.shift(),TokenType.BinaryOperator));
+      tokens.push(token(num, TokenType.Number));
+    } else if (isAlpha(src[0])) {
+      let ident = "";
+      while (src.length > 0 && isAlpha(src[0])) {
+        ident += src.shift();
       }
-      else if (src[0] == '=') {
-        tokens.push(token(src.shift(),TokenType.Equals));
-      } else{
-
-          //meerdere characters token verwerken
-
-          //maak nummer token
-          if (isint(scr[0])){
-            let num ="";
-            while (scr.length > 0 && isint(scr[0])){
-              num += scr.shift
-            }
-            tokens.push(token(num,TokenType.Number))
-
-            //maak text token
-          }else{
-            if (isaplha(src[0])){
-
-              let ident ="";
-              while(src.length > 0 && isaplha(scr[0])){
-                ident += scr.shift();
-              }
-
-              //contorler gereserveerde keywords
-              const reserved = KEYWORDS[ident]
-              if(reserved == undefined){
-                tokens.push(token(ident,TokenType.Identifier))
-              }else{
-                tokens.push(token(ident,TokenType.reserved))
-              } 
-            }
-          }
-      }  
+      const reserved = KEYWORDS[ident];
+      if (reserved === undefined) {
+        tokens.push(token(ident, TokenType.Identifier));
+      } else {
+        tokens.push(token(ident, reserved));
+      }
+    } else {
+      console.log("Onbekend teken niet geïmplementeerd:", src[0]);
+      src.shift(); // Ga voorbij het onbekende teken om oneindige lus te voorkomen
+    }
   }
 
   return tokens;
 }
+
+// output tonen lexer
+fs.readFile('text.txt', 'utf8', (err, data) => {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  console.log("Bestandsinhoud:", data); // Log de inhoud van het bestand
+  const tokens = tokenize(data.trim());
+  console.log(tokens);
+});
