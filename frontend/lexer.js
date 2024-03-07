@@ -1,4 +1,4 @@
-const fs = require('fs');
+import fs from 'fs';
 
 // Definitie van token types
 const TokenType = {
@@ -91,3 +91,5 @@ fs.readFile('text.txt', 'utf8', (err, data) => {
   const tokens = tokenize(data.trim());
   console.log(tokens);
 });
+
+export { tokenize, token, TokenType };
