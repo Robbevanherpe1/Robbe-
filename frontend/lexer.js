@@ -77,11 +77,11 @@ function tokenize(sourceCode) {
       src.shift(); // Ga voorbij het onbekende teken om oneindige lus te voorkomen
     }
   }
-  tokens.push((TokenType.EOF,"Einde bestand" ))
+  tokens.push(token("EOF", TokenType.EOF));
   return tokens;
 }
 
-// output tonen lexer
+// voorbeel output tonen lexer
 fs.readFile('text.txt', 'utf8', (err, data) => {
   if (err) {
     console.error(err);
@@ -92,4 +92,4 @@ fs.readFile('text.txt', 'utf8', (err, data) => {
   console.log(tokens);
 });
 
-export { tokenize, token, TokenType };
+export {tokenize,token,TokenType};
