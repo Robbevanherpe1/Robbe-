@@ -1,3 +1,4 @@
+import { readFile } from 'fs/promises';
 import { tokenize, TokenType } from './lexer.js';
 
 class Parser {
@@ -133,13 +134,18 @@ class Parser {
   }
 }
 
+async function loadAndParseSourceCode() {
+  try {
+    const sourceCode = await readFile('text.txt', 'utf8');
+    
+    // Now that sourceCode is defined, you can tokenize and parse it
+    const tokens = tokenize(sourceCode);
+    const parser = new Parser(tokens);
+    const ast = parser.parse();
+    console.log(ast);
+  } catch (error) {
+    console.error('Failed to read file:', error);
+  }
+}
 
-const sourceCode = 'let x = 5 + 3';
-
-const tokens = tokenize(sourceCode)
-
-// Usage example
-// Assuming `tokens` is an array of tokens from the lexer
-const parser = new Parser(tokens);
-const ast = parser.parse();
-console.log(ast);
+loadAndParseSourceCode();

@@ -92,4 +92,5 @@ fs.readFile('text.txt', 'utf8', (err, data) => {
   console.log(tokens);
 });
 
+
 export {tokenize,token,TokenType};
